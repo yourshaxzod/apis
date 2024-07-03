@@ -29,7 +29,7 @@ let getYoutube = async (url) => {
   } catch (error) {
     return {
       ok: false,
-      msg: 'Error fetching video info',
+      msg: error,
     };
   }
 };

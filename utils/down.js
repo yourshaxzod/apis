@@ -28,10 +28,10 @@ async function getMusicDown(videoUrl) {
                 msg: 'Failed to fetch music'
             }
         }
-    } catch (err) {
+    } catch (error) {
         return {
             ok: false,
-            msg: 'Failed to fetch music'
+            msg: error
         }
     }
 }

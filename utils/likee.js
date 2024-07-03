@@ -42,7 +42,7 @@ let getLikee = async (url) => {
     } catch (error) {
         return {
             ok: false,
-            msg: 'Failed to fetch video data'
+            msg: error
         };
     }
 };
