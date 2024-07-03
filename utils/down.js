@@ -29,9 +29,10 @@ async function getMusicDown(videoUrl) {
             }
         }
     } catch (error) {
+        console.log(error);
         return {
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         }
     }
 }

@@ -20,7 +20,7 @@ let getPinterest = async (url) => {
         console.log(error)
         return {
             ok: false,
-            msg: error,
+            msg: "Error fetching data.",
         };
     }
 };

@@ -51,7 +51,7 @@ app.get('/instagram/', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         });
     }
 });
@@ -86,7 +86,7 @@ app.get('/youtube/', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         });
     }
 });
@@ -121,7 +121,7 @@ app.get('/tiktok/', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         });
     }
 });
@@ -156,7 +156,7 @@ app.get('/likee/', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         });
     }
 });
@@ -191,7 +191,7 @@ app.get('/pinterest/', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         });
     }
 });
@@ -215,7 +215,7 @@ app.get('/search/', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         });
     }
 });
@@ -239,7 +239,7 @@ app.get('/down/', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         });
     }
 });

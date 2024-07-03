@@ -40,9 +40,10 @@ async function getMusicSearch(query) {
 
     return result
   } catch (error) {
+    console.log(error);
     return {
       ok: false,
-      msg: error
+      msg: "Error fetching data."
     }
   }
 }

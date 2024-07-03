@@ -106,9 +106,10 @@ let getInstagram = async (shortCode) => {
         };
 
     } catch (error) {
+        console.log(error);
         return {
             ok: false,
-            msg: error
+            msg: "Error fetching data."
         };
     }
 };
