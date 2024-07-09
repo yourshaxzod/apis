@@ -1,35 +1,20 @@
-const axios = require('axios');
+const { likee } = require("nayan-media-downloader");
 
 let getLikee = async (url) => {
     try {
-        url = `https://likeam.ru/api/fetch?url=${url}`;
-        const response = await axios.get(url);
+        const response = await likee(url);
 
-        if (response.data.meta.id != null) {
-            let info = response.data
+        if (response.status == 200) {
+            let info = response
             return {
                 ok: true,
                 info: {
-                    id: info.meta.id,
                     type: 'video',
-                    caption: info.meta.caption,
-                    thumbnail: info.meta.cover,
-                    stats: {
-                        likes: info.stats.likes,
-                        comments: info.stats.comments,
-                        views: info.stats.views,
-                        shares: info.stats.shares,
-                        downloads: info.stats.downloads
-                    },
-                    author: {
-                        id: info.user.id,
-                        name: info.user.name,
-                        username: info.user.username,
-                        avatar: info.user.avatar
-                    },
+                    caption: info.data.title,
+                    thumbnail: info.data.thumbnail,
                     formats: {
                         type: 'video',
-                        url: info.download_url
+                        url: info.data.withoutwatermark
                     }
                 }
             }
