@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 // Instagram video ma'lumotlarini olish
 app.get('/instagram/', async (req, res) => {
     const mediaUrl = req.query.url;
-    const videoRegex = /https:\/\/www\.instagram\.com\/(p|reel)\/([A-Za-z0-9-_]+)\/?/;
+    const videoRegex = /https:\/\/www\.instagram\.com\/(p|reel|stories\/[A-Za-z0-9-_]+|s\/[A-Za-z0-9-_]+)\/([A-Za-z0-9-_]+)\/?/;
 
     if (!mediaUrl) {
         return res.status(400).json({
@@ -37,8 +37,7 @@ app.get('/instagram/', async (req, res) => {
         let result;
 
         if (match) {
-            const identifier = match[2];
-            result = await getInstagram(identifier);
+            result = await getInstagram(mediaUrl);
         } else {
             result = {
                 ok: false,

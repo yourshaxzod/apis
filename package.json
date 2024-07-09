@@ -13,6 +13,7 @@
     "axios": "^1.7.2",
     "express": "^4.19.2",
     "googleapis": "^140.0.1",
+    "instagram-url-direct": "^1.0.16",
     "youtube-music-dl": "^1.1.2",
     "ytdl-core": "^4.11.5"
   }
