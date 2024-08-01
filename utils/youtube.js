@@ -4,29 +4,47 @@ let getYoutube = async (url) => {
   try {
     const info = await ytdl.getInfo(url);
 
-    // Video va audio formatlarini filtrlash
+    // Faqat video formatlarini filtrlash
     const videoFormats = info.formats.filter(format => format.mimeType.startsWith('video/mp4'));
+
+    // Faqat audio formatlarini filtrlash
     const audioFormats = info.formats.filter(format => format.mimeType.startsWith('audio/mp4'));
+
+    // Yaxshi sifatdagi video formatini tanlash
+    const bestVideoFormat = videoFormats.reduce((best, format) => {
+      if (!best || (format.qualityLabel && format.qualityLabel > best.qualityLabel)) {
+        return format;
+      }
+      return best;
+    }, null);
+
+    // Yaxshi sifatdagi audio formatini tanlash
+    const bestAudioFormat = audioFormats.reduce((best, format) => {
+      if (!best || (format.audioBitrate && format.audioBitrate > best.audioBitrate)) {
+        return format;
+      }
+      return best;
+    }, null);
 
     // Formatlarni saqlash
     const formats = [
-      ...videoFormats.map(format => ({
-        itag: format.itag,
-        mimeType: format.mimeType,
-        quality: format.qualityLabel || format.quality,
-        audio: format.audioBitrate || null,
-        type: format.container || null,
-        url: format.url
-      })),
-      ...audioFormats.map(format => ({
-        itag: format.itag,
-        mimeType: format.mimeType,
-        quality: format.qualityLabel || format.quality,
-        audio: format.audioBitrate || null,
-        type: format.container || null,
-        url: format.url
-      }))
-    ];
+      bestVideoFormat ? {
+        itag: bestVideoFormat.itag,
+        mimeType: bestVideoFormat.mimeType,
+        quality: bestVideoFormat.qualityLabel || bestVideoFormat.quality,
+        audio: bestVideoFormat.audioBitrate || null,
+        type: bestVideoFormat.container || null,
+        url: bestVideoFormat.url
+      } : null,
+      bestAudioFormat ? {
+        itag: bestAudioFormat.itag,
+        mimeType: bestAudioFormat.mimeType,
+        quality: bestAudioFormat.qualityLabel || bestAudioFormat.quality,
+        audio: bestAudioFormat.audioBitrate || null,
+        type: bestAudioFormat.container || null,
+        url: bestAudioFormat.url
+      } : null
+    ].filter(format => format !== null); // Null formatlarni olib tashlash
 
     return {
       ok: true,
