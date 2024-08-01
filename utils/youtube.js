@@ -12,7 +12,7 @@ let getYoutube = async (url) => {
 
     const audioFormats = info.formats.filter(format => 
       format.mimeType.startsWith('audio/mp4') && 
-      format.mimeType.includes('av01')
+      format.mimeType.includes('mp4a')
     );
 
     // Formatlarni saqlash
