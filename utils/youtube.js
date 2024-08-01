@@ -7,12 +7,12 @@ let getYoutube = async (url) => {
     // 'avc1' bilan boshlanuvchi formatlarni filtrlash
     const videoFormats = info.formats.filter(format => 
       format.mimeType.startsWith('video/mp4') && 
-      format.mimeType.includes('avc1')
+      format.mimeType.includes('av01')
     );
 
     const audioFormats = info.formats.filter(format => 
       format.mimeType.startsWith('audio/mp4') && 
-      format.mimeType.includes('avc1')
+      format.mimeType.includes('av01')
     );
 
     // Formatlarni saqlash
