@@ -4,14 +4,29 @@ let getYoutube = async (url) => {
   try {
     const info = await ytdl.getInfo(url);
 
-    const formats = info.formats.map(format => ({
-      itag: format.itag,
-      mimeType: format.mimeType,
-      quality: format.qualityLabel || format.quality,
-      audio: format.audioBitrate || null,
-      type: format.container || null,
-      url: format.url
-    }));
+    // Video va audio formatlarini filtrlash
+    const videoFormats = info.formats.filter(format => format.mimeType.startsWith('video/mp4'));
+    const audioFormats = info.formats.filter(format => format.mimeType.startsWith('audio/mp4'));
+
+    // Formatlarni saqlash
+    const formats = [
+      ...videoFormats.map(format => ({
+        itag: format.itag,
+        mimeType: format.mimeType,
+        quality: format.qualityLabel || format.quality,
+        audio: format.audioBitrate || null,
+        type: format.container || null,
+        url: format.url
+      })),
+      ...audioFormats.map(format => ({
+        itag: format.itag,
+        mimeType: format.mimeType,
+        quality: format.qualityLabel || format.quality,
+        audio: format.audioBitrate || null,
+        type: format.container || null,
+        url: format.url
+      }))
+    ];
 
     return {
       ok: true,
