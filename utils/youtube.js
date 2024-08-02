@@ -44,6 +44,7 @@ let getYoutube = async (url) => {
         duration: info.videoDetails.lengthSeconds,
         views: info.viewCount,
         author: info.videoDetails.author.name,
+        username: info.videoDetails.author.usernmae,
         thumbnail: info.videoDetails.thumbnails?.[info.videoDetails.thumbnails.length - 1]?.url || null,
         formats: formats
       }
