@@ -16,6 +16,6 @@
     "instagram-url-direct": "^1.0.16",
     "nayan-media-downloader": "^2.4.2",
     "youtube-music-dl": "^1.1.2",
-    "ytdl-core": "^4.11.5"
+    "@distube/ytdl-core": "^4.13.7"
   }
 }
