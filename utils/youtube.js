@@ -27,7 +27,7 @@ let getYoutube = async (url) => {
         const audioFormats = sortedFormats.filter(format => format.mimeType.includes('audio/mp4'))
 
         // Formatlarni saqlash
-        const videoFormats = [
+        const formatedVideoFormats = [
             ...videoFormats.map(format => ({
                 itag: format.itag,
                 mimeType: format.mimeType,
@@ -39,7 +39,7 @@ let getYoutube = async (url) => {
             }))
         ]
 
-        const audioFormats = [
+        const formatedAudioFormats = [
             ...audioFormats.map(format => ({
                 itag: format.itag,
                 mimeType: format.mimeType,
@@ -62,8 +62,8 @@ let getYoutube = async (url) => {
                 author: info.videoDetails.author.name,
                 username: info.videoDetails.author.user,
                 thumbnail: info.videoDetails.thumbnails?.[info.videoDetails.thumbnails.length - 2]?.url || null,
-                formats: videoFormats,
-                audio: audioFormats
+                formats: formatedVideoFormats,
+                audio: formatedAudioFormats
             }
         };
     } catch (error) {
