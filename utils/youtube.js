@@ -1,6 +1,5 @@
 const ytdl = require('@distube/ytdl-core');
 
-// Define quality levels
 const qualityLevels = {
     1: ['144p', '144p60', '144p HDR', '144p60 HDR'],
     2: ['240p', '240p60', '240p HDR', '240p60 HDR'],
@@ -12,7 +11,6 @@ const qualityLevels = {
     8: ['4320p', '4320p60', '4320p HDR', '4320p60 HDR']
 };
 
-// Normalize quality function
 const normalizeQuality = (quality) => {
     if (quality.includes('2160p')) return '2K';
     if (quality.includes('4320p')) return '4K';
@@ -22,7 +20,6 @@ const normalizeQuality = (quality) => {
         .trim();
 };
 
-// Function to get the best format based on quality
 const getBestFormat = (formats, qualityLevels) => {
     const levelFormats = new Map();
 
@@ -39,14 +36,12 @@ const getBestFormat = (formats, qualityLevels) => {
     return Array.from(levelFormats.values()).filter(format => format.mimeType.includes('video/mp4'));
 };
 
-// Function to get the best audio format
 const getBestAudioFormat = (formats) => {
     return formats
         .filter(format => format.mimeType.includes('audio/mp4'))
         .sort((a, b) => (b.audioBitrate || 0) - (a.audioBitrate || 0))[0] || null;
 };
 
-// Function to format the format details
 const formatDetails = (formats) => formats.map(format => ({
     itag: format.itag,
     mimeType: format.mimeType,
@@ -80,7 +75,7 @@ const getYoutube = async (url) => {
                 username: info.videoDetails.author.user,
                 thumbnail: info.videoDetails.thumbnails?.[info.videoDetails.thumbnails.length - 1]?.url || null,
                 formats: formatDetails(videoFormats),
-                audio: bestAudioFormat ? formatDetails([bestAudioFormat]) : [] // Return only the best audio format
+                audio: bestAudioFormat ? formatDetails([bestAudioFormat]) : []
             }
         };
     } catch (error) {
