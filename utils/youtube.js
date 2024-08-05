@@ -1,55 +1,72 @@
-const ytdl = require('@distube/ytdl-core')
+const ytdl = require('@distube/ytdl-core');
 
-let getYoutube = async (url) => {
+// Define quality levels
+const qualityLevels = {
+    1: ['144p', '144p60', '144p HDR', '144p60 HDR'],
+    2: ['240p', '240p60', '240p HDR', '240p60 HDR'],
+    3: ['360p', '360p60', '360p HDR', '360p60 HDR'],
+    4: ['480p', '480p60', '480p HDR', '480p60 HDR'],
+    5: ['720p', '720p60', '720p HDR', '720p60 HDR'],
+    6: ['1080p', '1080p60', '1080p HDR', '1080p60 HDR'],
+    7: ['2160p', '2160p60', '2160p HDR', '2160p60 HDR'],
+    8: ['4320p', '4320p60', '4320p HDR', '4320p60 HDR']
+};
+
+// Normalize quality function
+const normalizeQuality = (quality) => {
+    if (quality.includes('2160p')) return '2K';
+    if (quality.includes('4320p')) return '4K';
+    return quality
+        .replace('p60', 'p')
+        .replace('HDR', '')
+        .trim();
+};
+
+// Function to get the best format based on quality
+const getBestFormat = (formats, qualityLevels) => {
+    const levelFormats = new Map();
+
+    for (let level = 1; level <= 8; level++) {
+        for (const quality of qualityLevels[level]) {
+            const format = formats.find(f => normalizeQuality(f.qualityLabel || f.quality) === normalizeQuality(quality));
+            if (format) {
+                levelFormats.set(level, format);
+                break;
+            }
+        }
+    }
+
+    return Array.from(levelFormats.values()).filter(format => format.mimeType.includes('video/mp4'));
+};
+
+// Function to get the best audio format
+const getBestAudioFormat = (formats) => {
+    return formats
+        .filter(format => format.mimeType.includes('audio/mp4'))
+        .sort((a, b) => (b.audioBitrate || 0) - (a.audioBitrate || 0))[0] || null;
+};
+
+// Function to format the format details
+const formatDetails = (formats) => formats.map(format => ({
+    itag: format.itag,
+    mimeType: format.mimeType,
+    quality: normalizeQuality(format.qualityLabel || format.quality),
+    audio: format.audioBitrate || null,
+    type: format.container || null,
+    contentLength: format.contentLength,
+    url: format.url
+}));
+
+const getYoutube = async (url) => {
     try {
-        const info = await ytdl.getInfo(url)
+        const info = await ytdl.getInfo(url);
 
         const formats = info.formats.filter(format =>
             format.mimeType.includes('video/mp4') || format.mimeType.includes('audio/mp4')
         );
 
-        const uniqueFormats = {}
-
-        formats.forEach(format => {
-            const qualityKey = format.qualityLabel || format.audioBitrate
-            if (!uniqueFormats[qualityKey]) {
-                uniqueFormats[qualityKey] = format
-            }
-        })
-
-        const sortedFormats = Object.values(uniqueFormats).sort((a, b) => {
-            const qualityA = a.qualityLabel ? parseInt(a.qualityLabel) : a.audioBitrate
-            const qualityB = b.qualityLabel ? parseInt(b.qualityLabel) : b.audioBitrate
-            return qualityA - qualityB
-        });
-
-        const videoFormats = sortedFormats.filter(format => format.mimeType.includes('video/mp4'))
-        const audioFormats = sortedFormats.filter(format => format.mimeType.includes('audio/mp4'))
-
-        // Formatlarni saqlash
-        const formatedVideoFormats = [
-            ...videoFormats.map(format => ({
-                itag: format.itag,
-                mimeType: format.mimeType,
-                quality: format.qualityLabel || format.quality,
-                audio: format.audioBitrate || null,
-                type: format.container || null,
-                contentLength: format.contentLength,
-                url: format.url
-            }))
-        ]
-
-        const formatedAudioFormats = [
-            ...audioFormats.map(format => ({
-                itag: format.itag,
-                mimeType: format.mimeType,
-                quality: format.qualityLabel || format.quality,
-                audio: format.audioBitrate || null,
-                type: format.container || null,
-                contentLength: format.contentLength,
-                url: format.url
-            }))
-        ]
+        const videoFormats = getBestFormat(formats, qualityLevels);
+        const bestAudioFormat = getBestAudioFormat(formats);
 
         return {
             ok: true,
@@ -62,8 +79,8 @@ let getYoutube = async (url) => {
                 author: info.videoDetails.author.name,
                 username: info.videoDetails.author.user,
                 thumbnail: info.videoDetails.thumbnails?.[info.videoDetails.thumbnails.length - 1]?.url || null,
-                formats: formatedVideoFormats,
-                audio: formatedAudioFormats
+                formats: formatDetails(videoFormats),
+                audio: bestAudioFormat ? formatDetails([bestAudioFormat]) : [] // Return only the best audio format
             }
         };
     } catch (error) {
@@ -75,4 +92,4 @@ let getYoutube = async (url) => {
     }
 };
 
-module.exports = { getYoutube }
+module.exports = { getYoutube };
