@@ -1,5 +1,9 @@
 const ytdl = require('@distube/ytdl-core');
 
+// Example proxy URI
+const PROXY_URI = 'http://122.200.19.103:8080';
+const PROXY_AGENT = ytdl.createProxyAgent({ uri: PROXY_URI });
+
 const qualityLevels = {
     1: ['144p', '144p60', '144p HDR', '144p60 HDR'],
     2: ['240p', '240p60', '240p HDR', '240p60 HDR'],
@@ -9,40 +13,40 @@ const qualityLevels = {
     6: ['1080p', '1080p60', '1080p HDR', '1080p60 HDR'],
     7: ['2160p', '2160p60', '2160p HDR', '2160p60 HDR'],
     8: ['4320p', '4320p60', '4320p HDR', '4320p60 HDR']
-}
+};
 
 const normalizeQuality = (quality) => {
-    if (!quality) return ''
-    if (quality.includes('2160p')) return '2K'
-    if (quality.includes('4320p')) return '4K'
+    if (!quality) return '';
+    if (quality.includes('2160p')) return '2K';
+    if (quality.includes('4320p')) return '4K';
     return quality
         .replace('p60', 'p')
         .replace('HDR', '')
-        .trim()
-}
+        .trim();
+};
 
 const getBestFormat = (formats, qualityLevels) => {
-    const levelFormats = new Map()
+    const levelFormats = new Map();
 
     for (let level = 1; level <= 8; level++) {
         for (const quality of qualityLevels[level]) {
-            const normalizedQuality = normalizeQuality(quality)
-            const format = formats.find(f => normalizeQuality(f.qualityLabel || f.quality) === normalizedQuality)
+            const normalizedQuality = normalizeQuality(quality);
+            const format = formats.find(f => normalizeQuality(f.qualityLabel || f.quality) === normalizedQuality);
             if (format) {
-                levelFormats.set(level, format)
-                break
+                levelFormats.set(level, format);
+                break;
             }
         }
     }
 
-    return Array.from(levelFormats.values()).filter(format => format.mimeType && format.mimeType.includes('video/mp4'))
-}
+    return Array.from(levelFormats.values()).filter(format => format.mimeType && format.mimeType.includes('video/mp4'));
+};
 
 const getBestAudioFormat = (formats) => {
     return formats
         .filter(format => format.mimeType && format.mimeType.includes('audio/mp4'))
-        .sort((a, b) => (b.audioBitrate || 0) - (a.audioBitrate || 0))[0] || null
-}
+        .sort((a, b) => (b.audioBitrate || 0) - (a.audioBitrate || 0))[0] || null;
+};
 
 const formatDetails = (formats) => formats.map(format => ({
     itag: format.itag,
@@ -52,18 +56,18 @@ const formatDetails = (formats) => formats.map(format => ({
     type: format.container || null,
     contentLength: format.contentLength,
     url: format.url
-}))
+}));
 
 const getYoutube = async (url) => {
     try {
-        const info = await ytdl.getInfo(url)
+        const info = await ytdl.getInfo(url, { agent: PROXY_AGENT });
 
         const formats = info.formats.filter(format =>
             format.mimeType && (format.mimeType.includes('video/mp4') || format.mimeType.includes('audio/mp4'))
-        )
+        );
 
-        const videoFormats = getBestFormat(formats, qualityLevels)
-        const bestAudioFormat = getBestAudioFormat(formats)
+        const videoFormats = getBestFormat(formats, qualityLevels);
+        const bestAudioFormat = getBestAudioFormat(formats);
 
         return {
             ok: true,
@@ -87,14 +91,14 @@ const getYoutube = async (url) => {
                     url: bestAudioFormat.url
                 }
             }
-        }
+        };
     } catch (error) {
-        console.log(error)
+        console.log(error);
         return {
             ok: false,
             msg: "Error fetching data.",
-        }
+        };
     }
-}
+};
 
-module.exports = { getYoutube }
+module.exports = { getYoutube };
