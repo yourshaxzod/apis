@@ -300,30 +300,29 @@ const getYoutube = async (url) => {
         const videoFormats = getBestFormat(formats, qualityLevels)
         const bestAudioFormat = getBestAudioFormat(formats)
 
-        // return {
-        //     ok: true,
-        //     info: {
-        //         id: info.videoDetails.videoId,
-        //         title: info.videoDetails.title,
-        //         caption: info.videoDetails.description,
-        //         duration: info.videoDetails.lengthSeconds,
-        //         views: info.viewCount,
-        //         author: info.videoDetails.author.name,
-        //         username: info.videoDetails.author.user,
-        //         thumbnail: info.videoDetails.thumbnails?.[info.videoDetails.thumbnails.length - 1]?.url || null,
-        //         formats: formatDetails(videoFormats),
-        //         audio: {
-        //             itag: bestAudioFormat.itag,
-        //             mimeType: bestAudioFormat.mimeType,
-        //             quality: bestAudioFormat.qualityLabel,
-        //             audio: bestAudioFormat.audioBitrate || null,
-        //             type: bestAudioFormat.container || null,
-        //             contentLength: bestAudioFormat.contentLength,
-        //             url: bestAudioFormat.url
-        //         }
-        //     }
-        // }
-        console.log(formatDetails(videoFormats))
+        return {
+            ok: true,
+            info: {
+                id: info.videoDetails.videoId,
+                title: info.videoDetails.title,
+                caption: info.videoDetails.description,
+                duration: info.videoDetails.lengthSeconds,
+                views: info.viewCount,
+                author: info.videoDetails.author.name,
+                username: info.videoDetails.author.user,
+                thumbnail: info.videoDetails.thumbnails?.[info.videoDetails.thumbnails.length - 1]?.url || null,
+                formats: formatDetails(videoFormats),
+                audio: {
+                    itag: bestAudioFormat.itag,
+                    mimeType: bestAudioFormat.mimeType,
+                    quality: bestAudioFormat.qualityLabel,
+                    audio: bestAudioFormat.audioBitrate || null,
+                    type: bestAudioFormat.container || null,
+                    contentLength: bestAudioFormat.contentLength,
+                    url: bestAudioFormat.url
+                }
+            }
+        }
     } catch (error) {
         console.log(error)
         return {
