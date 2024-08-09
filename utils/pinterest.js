@@ -1,9 +1,9 @@
-const axios = require('axios');
+const axios = require('axios')
 
 let getPinterest = async (url) => {
     try {
-        url = `https://pinterestdownloader.io/frontendService/DownloaderService?url=${url}`;
-        const response = await axios.get(url);
+        url = `https://pinterestdownloader.io/frontendService/DownloaderService?url=${url}`
+        const response = await axios.get(url)
 
         let info = response.data
 
@@ -21,8 +21,8 @@ let getPinterest = async (url) => {
         return {
             ok: false,
             msg: "Error fetching data.",
-        };
+        }
     }
-};
+}
 
-module.exports = { getPinterest };
+module.exports = { getPinterest }

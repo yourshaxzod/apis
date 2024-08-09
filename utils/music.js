@@ -1,7 +1,7 @@
-const { google } = require('googleapis');
-const youtube = google.youtube('v3');
+const { google } = require('googleapis')
+const youtube = google.youtube('v3')
 
-const apiKey = 'AIzaSyBSXhhv5pBnSF8OObFPeJY5eS3IqL67yLw';
+const apiKey = 'AIzaSyBSXhhv5pBnSF8OObFPeJY5eS3IqL67yLw'
 
 async function getMusicSearch(query) {
   try {
@@ -12,9 +12,9 @@ async function getMusicSearch(query) {
       type: 'video',
       videoCategoryId: '10',
       maxResults: 10,
-    });
+    })
 
-    const items = response.data.items;
+    const items = response.data.items
 
     if (items.length === 0) {
       return {
@@ -30,7 +30,7 @@ async function getMusicSearch(query) {
         title: item.snippet.title,
         url: item.id.videoId
       })
-    });
+    })
 
     let result = {
       ok: true,

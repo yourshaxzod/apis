@@ -1,12 +1,12 @@
-const axios = require('axios');
+const axios = require('axios')
 
 let getTikTok = async (url) => {
     try {
-        url = `https://tikwm.com/api/?url=${url}`;
-        const response = await axios.get(url);
+        url = `https://tikwm.com/api/?url=${url}`
+        const response = await axios.get(url)
 
         if (response.data.code == 0) {
-            let info = response.data.data;
+            let info = response.data.data
             return {
                 ok: true,
                 info: {
@@ -40,20 +40,20 @@ let getTikTok = async (url) => {
                         }
                     ]
                 }
-            };
+            }
         } else {
             return {
                 ok: false,
                 msg: 'Failed to fetch video data'
-            };
+            }
         }
     } catch (error) {
         console.log(error);
         return {
             ok: false,
             msg: "Error fetching data."
-        };
+        }
     }
 };
 
-module.exports = { getTikTok };
+module.exports = { getTikTok }

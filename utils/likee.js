@@ -1,4 +1,4 @@
-const { likee } = require("nayan-media-downloader");
+const { likee } = require("nayan-media-downloader")
 
 let getLikee = async (url) => {
     try {
