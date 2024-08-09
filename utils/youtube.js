@@ -1,116 +1,77 @@
-const ytdl = require('@distube/ytdl-core')
-const NodeCache = require('node-cache')
-const cache = new NodeCache({ stdTTL: 3600 }) // 1 soat (3600 soniya) caching
+const axios = require('axios')
 
-// 152.26.229.66:9443
-// 152.26.229.42:9443
-
-const agent = ytdl.createProxyAgent({ uri: "http://152.26.229.66:9443" })
-
-const qualityLevels = {
-    1: ['144p', '144p60', '144p HDR', '144p60 HDR'],
-    2: ['240p', '240p60', '240p HDR', '240p60 HDR'],
-    3: ['360p', '360p60', '360p HDR', '360p60 HDR'],
-    4: ['480p', '480p60', '480p HDR', '480p60 HDR'],
-    5: ['720p', '720p60', '720p HDR', '720p60 HDR'],
-    6: ['1080p', '1080p60', '1080p HDR', '1080p60 HDR'],
-    7: ['2160p', '2160p60', '2160p HDR', '2160p60 HDR'],
-    8: ['4320p', '4320p60', '4320p HDR', '4320p60 HDR']
-}
-
-const normalizeQuality = (quality) => {
-    if (!quality) return ''
-    if (quality.includes('2160p')) return '2K'
-    if (quality.includes('4320p')) return '4K'
-    return quality
-        .replace('p60', 'p')
-        .replace('HDR', '')
-        .trim()
-}
-
-const getBestFormat = (formats, qualityLevels) => {
-    const levelFormats = new Map()
-
-    for (let level = 1; level <= 8; level++) {
-        for (const quality of qualityLevels[level]) {
-            const normalizedQuality = normalizeQuality(quality)
-            const format = formats.find(f => normalizeQuality(f.qualityLabel || f.quality) === normalizedQuality)
-            if (format) {
-                levelFormats.set(level, format)
-                break
-            }
-        }
+function formatBytes(bytes) {
+    const mb = bytes / (1024 * 1024)
+    return {
+        mb: mb.toFixed()
     }
-
-    return Array.from(levelFormats.values()).filter(format => format.mimeType && format.mimeType.includes('video/mp4'))
 }
 
-const getBestAudioFormat = (formats) => {
-    return formats
-        .filter(format => format.mimeType && format.mimeType.includes('audio/mp4'))
-        .sort((a, b) => (b.audioBitrate || 0) - (a.audioBitrate || 0))[0] || null
-}
+function extractUrlsAndFormatLengths(data) {
+    const urls = {}
 
-const formatDetails = (formats) => formats.map(format => ({
-    itag: format.itag,
-    mimeType: format.mimeType,
-    quality: normalizeQuality(format.qualityLabel || format.quality),
-    audio: format.audioBitrate || null,
-    type: format.container || null,
-    contentLength: format.contentLength,
-    url: format.url
-}))
-
-const getYoutube = async (url) => {
-    try {
-        const cacheKey = `youtube-${url}`
-        const cachedData = cache.get(cacheKey)
-
-        if (cachedData) {
-            return { ok: true, info: cachedData }
+    data.qualities.forEach(quality => {
+        if (quality.qualityInfo.itag === 18) {
+            urls.video360p = quality.url;
+            urls.video360pLength = formatBytes(quality.length)
         }
+        if (quality.qualityInfo.itag === 140) {
+            urls.audioM4a = quality.url;
+            urls.audioM4aLength = formatBytes(quality.length)
+        }
+    });
 
-        const info = await ytdl.getInfo(url, { agent })
+    return urls
+}
 
-        const formats = info.formats.filter(format =>
-            format.mimeType && (format.mimeType.includes('video/mp4') || format.mimeType.includes('audio/mp4'))
-        )
+let getYoutube = async (url) => {
+    try {
+        url = `https://downloader.freemake.com/api/videoinfo/${url}`;
+        const response = await axios.get(url, {
+            headers: {
+                accept: 'application/json, text/javascript, */*; q=0.01',
+                'accept-encoding': 'gzip, deflate, br, zstd',
+                'accept-language': 'en,ru;q=0.9,ru-RU;q=0.8,uz;q=0.7',
+                origin: 'https://www.freemake.com',
+                referer: 'https://www.freemake.com/free_video_downloader_skillful/',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'same-site',
+                'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+                'x-analytics-header': 'UA-18256617-1',
+                'x-cf-country': 'UZ',
+                'x-remote-host': 'www.freemake.com',
+                'x-request-attempt': '1',
+                'x-user-browser': 'Safari',
+                'x-user-id': '0a1649eb-99bf-fc8d-4a09-7cbf027b20be',
+                'x-user-platform': 'Linux x86_64'
+            }
+        })
 
-        const videoFormats = getBestFormat(formats, qualityLevels)
-        const bestAudioFormat = getBestAudioFormat(formats)
-
-        const result = {
+        let info = response.data
+        const urls = extractUrlsAndFormatLengths(info)
+        return {
             ok: true,
             info: {
-                id: info.videoDetails.videoId,
-                title: info.videoDetails.title,
-                caption: info.videoDetails.description,
-                duration: info.videoDetails.lengthSeconds,
-                views: info.viewCount,
-                author: info.videoDetails.author.name,
-                username: info.videoDetails.author.user,
-                thumbnail: info.videoDetails.thumbnails?.[info.videoDetails.thumbnails.length - 1]?.url || null,
-                formats: formatDetails(videoFormats),
+                id: info.videoId,
+                title: info.metaInfo.title,
+                duration: info.metaInfo.duration,
+                thumbnail: info.metaInfo.thumbnailUrls.hq ?? info.metaInfo.thumbnailUrls.mq ?? info.metaInfo.thumbnailUrls.default,
+                video: {
+                    length: urls.video360pLength.mb,
+                    url: urls.video360p
+                },
                 audio: {
-                    itag: bestAudioFormat.itag,
-                    mimeType: bestAudioFormat.mimeType,
-                    quality: bestAudioFormat.qualityLabel,
-                    audio: bestAudioFormat.audioBitrate || null,
-                    type: bestAudioFormat.container || null,
-                    contentLength: bestAudioFormat.contentLength,
-                    url: bestAudioFormat.url
+                    length: urls.audioM4aLength.mb,
+                    url: urls.audioM4a
                 }
             }
         }
-
-        cache.set(cacheKey, result)
-
-        return result
     } catch (error) {
         console.log(error)
         return {
             ok: false,
-            msg: "Error fetching data.",
+            msg: "Error fetching data."
         }
     }
 }
