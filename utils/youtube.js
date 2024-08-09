@@ -56,7 +56,7 @@ let getYoutube = async (url) => {
                 id: info.videoId,
                 title: info.metaInfo.title,
                 duration: info.metaInfo.duration,
-                thumbnail: info.metaInfo.thumbnailUrls.mq ?? info.metaInfo.thumbnailUrls.hq ?? info.metaInfo.thumbnailUrls.default,
+                thumbnail: info.metaInfo.thumbnailUrls.hq ?? info.metaInfo.thumbnailUrls.mq ?? info.metaInfo.thumbnailUrls.default,
                 video: {
                     length: urls.video360pLength.mb,
                     url: urls.video360p
