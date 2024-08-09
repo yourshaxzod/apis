@@ -49,7 +49,6 @@ let getYoutube = async (url) => {
         })
 
         let info = response.data
-        console.log(info)
         const urls = extractUrlsAndFormatLengths(info)
         return {
             ok: true,
